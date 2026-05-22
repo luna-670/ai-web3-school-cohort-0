@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能体（Agent）概念卡片 | AI × Web3 School</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --card-border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f0883e;
+    --danger: #f85149;
+    --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding-bottom: 4rem;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, #1a1f2e 0%, var(--bg) 100%);
+  }
+  .hero h1 { font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem; }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(88,166,255,0.15);
+    color: var(--accent);
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    margin: 0 0.25rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  .hero p { color: var(--text-dim); max-width: 600px; margin: 0.75rem auto 0; }
+
+  /* Section titles */
+  .section-title {
+    text-align: center;
+    margin: 3rem 0 1.5rem;
+    font-size: 1.5rem;
+    color: #fff;
+  }
+  .section-title span { color: var(--accent); }
+
+  /* Concept Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    min-height: 180px;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-inner {
+    padding: 1.5rem;
+    transition: opacity 0.3s;
+  }
+  .card-front, .card-back {
+    transition: all 0.3s;
+  }
+  .card-front h3 {
+    font-size: 1.15rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card-front .icon { font-size: 1.4rem; }
+  .card-front .tagline {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  .card-front .hint {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    opacity: 0.6;
+  }
+  .card-back {
+    display: none;
+    padding: 1.5rem;
+  }
+  .card.flipped .card-front { display: none; }
+  .card.flipped .card-back { display: block; }
+  .card-back h3 { color: var(--accent); margin-bottom: 0.75rem; font-size: 1.1rem; }
+  .card-back p { font-size: 0.9rem; color: var(--text); margin-bottom: 0.5rem; }
+  .card-back .relation {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(88,166,255,0.08);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+  }
+
+  /* Quiz Section */
+  .quiz-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  .quiz-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  .quiz-progress .dots {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .quiz-progress .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--card-border);
+    transition: background 0.3s;
+  }
+  .quiz-progress .dot.done { background: var(--accent2); }
+  .quiz-progress .dot.current { background: var(--accent); }
+  .quiz-progress .dot.wrong { background: var(--danger); }
+  .quiz-question {
+    font-size: 1.15rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .quiz-option {
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    color: var(--text);
+    text-align: left;
+  }
+  .quiz-option:hover { border-color: var(--accent); background: rgba(88,166,255,0.05); }
+  .quiz-option.correct { border-color: var(--accent2); background: rgba(63,185,80,0.1); }
+  .quiz-option.incorrect { border-color: var(--danger); background: rgba(248,81,73,0.1); }
+  .quiz-option:disabled { cursor: default; opacity: 0.8; }
+  .quiz-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(63,185,80,0.1); color: var(--accent2); border: 1px solid rgba(63,185,80,0.3); }
+  .quiz-feedback.incorrect { background: rgba(248,81,73,0.1); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+  .quiz-next {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.6rem 1.5rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .quiz-next.show { display: inline-block; }
+
+  /* Result */
+  .quiz-result {
+    text-align: center;
+    display: none;
+  }
+  .quiz-result.show { display: block; }
+  .quiz-result .score {
+    font-size: 3rem;
+    color: var(--accent);
+    font-weight: bold;
+  }
+  .quiz-result .message { color: var(--text-dim); margin: 0.5rem 0 1.5rem; }
+  .quiz-result .restart {
+    padding: 0.6rem 2rem;
+    background: var(--card-border);
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .quiz-result .restart:hover { background: var(--accent); color: #fff; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--card-border);
+    padding-top: 1.5rem;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <h1>🤖 智能体（Agent）</h1>
+  <div>
+    <span class="badge">Week 1</span>
+    <span class="badge">AI 基础</span>
+    <span class="badge">AI × Web3 School</span>
+  </div>
+  <p>Agent 是能围绕目标持续调用工具、读取状态、调整步骤的 AI 系统。<br>点击卡片翻面查看详细内容 👇</p>
+</header>
+
+<!-- Concept Cards -->
+<h2 class="section-title">📚 <span>核心概念卡片</span></h2>
+<div class="cards-grid" id="cardsGrid">
+  <!-- Cards generated by JS -->
+</div>
+
+<!-- Quiz -->
+<h2 class="section-title">🧩 <span>概念测验</span></h2>
+<div class="quiz-container" id="quizContainer">
+  <!-- Quiz generated by JS -->
+</div>
+
+<div class="footer">
+  <p>内容来源：<a href="https://aiweb3.school/zh/handbook/ai/agent/" target="_blank">AI × Web3 School Handbook — 智能体（Agent）</a></p>
+  <p>由 Hermes Agent 辅助生成 | <a href="https://github.com/luna-670/ai-web3-school-cohort-0" target="_blank">luna-670/ai-web3-school-cohort-0</a></p>
+</div>
+
+<script>
+// ---- Concept Cards Data ----
+const cards = [
+  {
+    icon: '🧠', title: '什么是 Agent？',
+    tagline: '不只是回答问题，而是能动手做事',
+    detail: 'Agent 是能围绕目标持续调用工具、读取状态、调整步骤的 AI 系统。它的关键不在"像人"，而在于能不能在明确权限和可审计流程里，把建议推进到行动。',
+    relation: '🔗 相关：Web3 Tool Use、MCP、Agent Workflow'
+  },
+  {
+    icon: '🔧', title: 'Tool Use（工具调用）',
+    tagline: '让 Agent 从"会回答"变成"能做事"',
+    detail: '工具让 Agent 调用外部能力：搜索、数据库、API、代码执行、邮件、支付接口等。但工具也让 Prompt Injection 和模型误判变得危险。工具设计要明确：输入 schema、权限范围、是否只读、是否产生外部副作用、哪些调用需要人工确认。',
+    relation: '🔗 相关：Web3 Tool Use、MCP'
+  },
+  {
+    icon: '🗺️', title: 'Planning（规划）',
+    tagline: '把目标拆成步骤，但计划不是授权',
+    detail: 'Planning 是把目标拆成步骤。一个好的 Agent plan 应该暴露：每一步需要什么工具、读还是写、哪些可自动执行、哪些需用户确认、失败时可否重试、如何验证任务完成。',
+    relation: '🔗 相关：Agent Workflow — 看 Agent 从目标到执行的流程拆分'
+  },
+  {
+    icon: '📋', title: 'State（状态）',
+    tagline: '任务进度、工具结果、失败原因都该被记录',
+    detail: 'State 是 Agent 当前任务的状态。很多 Demo 把 state 只放在 prompt 历史里，这不够。生产系统需要可查询、可恢复、可审计的 state。还应记录环境、版本、关键参数、确认请求和撤销事件。',
+    relation: '🔗 相关：Chain-aware Context、Agent Workflow'
+  },
+  {
+    icon: '🪞', title: 'Reflection（反思）',
+    tagline: '自我检查提高质量，确定性检查承载风险',
+    detail: 'Reflection 是让 Agent 检查自己的中间结果，发现信息不足、工具失败、计划不合理后修正下一步。但模型可能给自己的错误找理由。写入、授权、支付等高风险动作，reflection 只能辅助诊断，不能作为最终安全判断。',
+    relation: '⚠️ 自我检查 ≠ 安全验证'
+  },
+  {
+    icon: '👥', title: 'Multi-Agent（多智能体）',
+    tagline: '分工协作，但也会放大协调问题',
+    detail: '多个 Agent 分工协作，适合复杂工作流。但会放大协调问题：上下文传递丢失、责任边界模糊、一个 Agent 的错误被另一个当成事实。先问：多个 Agent 是否真的减少复杂度？',
+    relation: '🔗 相关：Agentic Commerce、治理 AI'
+  },
+  {
+    icon: '⛓️', title: 'AI × Web3 中的 Agent',
+    tagline: '位在模型能力和链上执行之间',
+    detail: '一个稳的 AI × Web3 Agent 架构：用户提出目标→Agent 读取上下文→系统拆成只读/写入步骤→只读自动执行、写入进入 policy 检查→Simulation 展示链上影响→用户确认高风险动作→Wallet 执行→日志记录。最危险的设计：让 Agent 同时拥有模糊目标、广泛工具、长期记忆和大额资产权限。',
+    relation: '🔗 相关：Agent Wallet、Machine Payment、Agent Identity'
+  }
+];
+
+// ---- Render Cards ----
+const cardsGrid = document.getElementById('cardsGrid');
+cards.forEach((c, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-inner card-front">
+      <h3><span class="icon">${c.icon}</span>${c.title}</h3>
+      <p class="tagline">${c.tagline}</p>
+      <span class="hint">点击翻面 →</span>
+    </div>
+    <div class="card-inner card-back">
+      <h3>${c.icon} ${c.title}</h3>
+      <p>${c.detail}</p>
+      <div class="relation">${c.relation}</div>
+    </div>
+  `;
+  card.addEventListener('click', () => card.classList.toggle('flipped'));
+  cardsGrid.appendChild(card);
+});
+
+// ---- Quiz Data ----
+const quiz = [
+  {
+    q: 'Agent 的关键不在"像人"，而在于什么？',
+    options: ['能生成更长的文本', '能在明确权限和可审计流程里把建议推进到行动', '能同时对话多个人', '能记住所有历史对话'],
+    answer: 1,
+    explain: 'Agent 的核心是执行能力——一旦它能调用工具、写入系统，错误就不只是"答错"而是"做错"。'
+  },
+  {
+    q: '以下哪项是 Tool Use 设计时必须明确的内容？',
+    options: ['工具的 Logo 设计', '输入 schema、权限范围、是否只读、是否产生外部副作用', '工具的作者是谁', '工具的下载次数'],
+    answer: 1,
+    explain: '工具设计要明确输入 schema、权限范围、是否只读、是否产生外部副作用、调用前后如何记录、哪些需要人工确认。'
+  },
+  {
+    q: '为什么不能把 Agent State 只放在 prompt 历史里？',
+    options: ['因为 prompt 太长会变慢', '因为不可查询、不可恢复、不可审计', '因为 AI 不喜欢太长历史', '因为会占用太多内存'],
+    answer: 1,
+    explain: '生产系统需要可查询、可恢复、可审计的 state。否则很难回答：Agent 为什么调用了这个工具？是否已拿到用户确认？哪一步偏离了目标？'
+  },
+  {
+    q: 'Reflection（反思）为什么不能作为最终安全判断？',
+    options: ['因为太慢了', '因为模型可能给自己的错误找理由，自我检查只能辅助诊断', '因为只有多 Agent 才能自我检查', '因为 Reflection 功能还没开发完成'],
+    answer: 1,
+    explain: 'Agent 自我反思仍然由模型完成，模型可能给自己的错误找理由。写入、授权、支付等高风险动作，reflection 只能作为辅助诊断，不能作为最终安全判断。'
+  },
+  {
+    q: '最危险的 AI × Web3 Agent 设计是什么？',
+    options: ['Agent 只能读不能写', '让 Agent 同时拥有模糊目标、广泛工具、长期记忆和大额资产权限', 'Agent 每次操作都需人工确认', 'Agent 只能运行在测试网上'],
+    answer: 1,
+    explain: '最危险的设计是让 Agent 同时拥有模糊目标、广泛工具、长期记忆和大额资产权限——这相当于给了它"全权委托书"但没有明确边界。'
+  }
+];
+
+// ---- Render Quiz ----
+let currentQ = 0;
+let score = 0;
+let answered = new Array(quiz.length).fill(null);
+const quizContainer = document.getElementById('quizContainer');
+
+function renderQuiz() {
+  if (currentQ >= quiz.length) {
+    showResult();
+    return;
+  }
+  const q = quiz[currentQ];
+  quizContainer.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-progress">
+        <span>第 ${currentQ + 1} / ${quiz.length} 题</span>
+        <div class="dots">
+          ${answered.map((a, i) => {
+            if (a === null && i === currentQ) return '<div class="dot current"></div>';
+            if (a === true) return '<div class="dot done"></div>';
+            if (a === false) return '<div class="dot wrong"></div>';
+            return '<div class="dot"></div>';
+          }).join('')}
+        </div>
+      </div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options" id="options"></div>
+      <div class="quiz-feedback" id="feedback"></div>
+      <button class="quiz-next" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+    </div>
+  `;
+  const options = document.getElementById('options');
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.onclick = () => selectOption(i, btn);
+    options.appendChild(btn);
+  });
+}
+
+function selectOption(idx, btn) {
+  if (answered[currentQ] !== null) return; // already answered
+  const q = quiz[currentQ];
+  const correct = idx === q.answer;
+  answered[currentQ] = correct;
+  if (correct) score++;
+
+  // Disable all options & highlight
+  const allOpts = document.querySelectorAll('.quiz-option');
+  allOpts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === q.answer) o.classList.add('correct');
+    if (i === idx && !correct) o.classList.add('incorrect');
+  });
+
+  // Show feedback
+  const fb = document.getElementById('feedback');
+  fb.className = 'quiz-feedback show ' + (correct ? 'correct' : 'incorrect');
+  fb.textContent = correct ? '✅ 正确！' + q.explain : '❌ 不正确。' + q.explain;
+
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function nextQuestion() {
+  currentQ++;
+  renderQuiz();
+}
+
+function showResult() {
+  const pct = Math.round((score / quiz.length) * 100);
+  let msg = '';
+  if (pct === 100) msg = '🏆 满分！你对 Agent 的核心概念掌握得非常扎实！';
+  else if (pct >= 60) msg = '👍 不错！再复习一下卡片中的概念会有更大收获。';
+  else msg = '📖 没关系，翻回去看看概念卡片，再来挑战一次！';
+  quizContainer.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-result show">
+        <div class="score">${score}/${quiz.length}</div>
+        <div class="message">${msg}</div>
+        <button class="restart" onclick="restartQuiz()">🔄 重新测验</button>
+      </div>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  currentQ = 0;
+  score = 0;
+  answered = new Array(quiz.length).fill(null);
+  renderQuiz();
+}
+
+// Init
+renderQuiz();
+</script>
+
+</body>
+</html>
